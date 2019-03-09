@@ -14,11 +14,11 @@ import com.example.lab1.utils.NumberToString;
 
 public class CardAdapter extends RecyclerView.Adapter<CardAdapter.CardViewAdapter>  {
 
-    private int itemNumber;
+    private int itemCounts;
     private NumberToString converter;
 
     public CardAdapter(int n){
-        this.itemNumber = n;
+        this.itemCounts = n;
         this.converter = new NumberToString();
     }
 
@@ -44,7 +44,7 @@ public class CardAdapter extends RecyclerView.Adapter<CardAdapter.CardViewAdapte
 
     @Override
     public int getItemCount() {
-        return itemNumber;
+        return itemCounts;
     }
 
 

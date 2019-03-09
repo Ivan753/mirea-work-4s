@@ -48,6 +48,7 @@ public class NumberToString {
                 return forms[idx][2];
         }
     }
+
     private String triadToString(int n, int gender, boolean acceptZero) {
         if (!acceptZero && n == 0) return "";
         String res = "";
