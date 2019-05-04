@@ -68,6 +68,9 @@ public class MainActivity extends Activity {
             }
         });
 
+        // ! For test ids migration
+        db.execSQL("delete from students where id=3");
+
         //this.deleteDatabase("lab3");
     }
 
