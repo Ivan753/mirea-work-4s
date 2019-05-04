@@ -1,4 +1,4 @@
-package com.example.lab3_2;
+package com.example.lab3_1;
 
 import android.app.Activity;
 import android.content.ContentValues;

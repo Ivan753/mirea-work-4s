@@ -1,4 +1,4 @@
-package com.example.lab3_2;
+package com.example.lab3_1;
 
 import android.app.Activity;
 import android.database.Cursor;
@@ -6,7 +6,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import com.example.lab3_2.Adapter.CardAdapter;
+import com.example.lab3_1.Adapter.CardAdapter;
 
 import java.util.ArrayList;
 

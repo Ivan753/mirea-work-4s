@@ -1,4 +1,4 @@
-package com.example.lab3_2;
+package com.example.lab3_1;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -55,7 +55,9 @@ public class DBProvider {
             // create table of **students**
             db.execSQL("create table students (" +
                     "id integer  primary key autoincrement," +
-                    "full_name text, " +
+                    "first_name text, " +
+                    "last_name text, " +
+                    "middle_name text, " +
                     "date_add timestamp default CURRENT_TIMESTAMP" +
                     ");");
 
