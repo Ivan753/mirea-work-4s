@@ -7,6 +7,8 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
+import java.sql.Timestamp;
+
 public class DBProvider {
     /** Singleton keeping db */
 
@@ -113,7 +115,7 @@ public class DBProvider {
                             new String[]{
                                     c.getString(c.getColumnIndex("id")),
                                     full_name[1], full_name[0], full_name[2],
-                                    c.getString(c.getColumnIndex("date_add"))
+                                    String.valueOf(Timestamp.valueOf(c.getString(c.getColumnIndex("date_add"))))
                             }
                     );
                 }
