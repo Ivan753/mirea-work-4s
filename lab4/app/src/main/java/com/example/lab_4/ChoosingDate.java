@@ -1,22 +1,40 @@
 package com.example.lab_4;
 
-import android.app.Activity;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
+import android.appwidget.AppWidgetManager;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.widget.CalendarView;
+
+import com.example.lab_4.database.Alarm;
+import com.example.lab_4.database.AlarmDao;
+import com.example.lab_4.database.AppDatabase;
+import com.example.lab_4.database.DBProvider;
 
 import java.util.Calendar;
 import java.util.TimeZone;
 
-public class ChoosingDate extends Activity {
-
+public class ChoosingDate extends AppCompatActivity {
+    int widgetID = AppWidgetManager.INVALID_APPWIDGET_ID;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_choosing_date);
+
+
+        Intent iintent = getIntent();
+        Bundle extras = iintent.getExtras();
+        if (extras != null) {
+            widgetID = extras.getInt(
+                    AppWidgetManager.EXTRA_APPWIDGET_ID,
+                    AppWidgetManager.INVALID_APPWIDGET_ID
+            );
+        }
+
+        System.out.println("LOKNOJNOvo oj "+widgetID);
 
         final Context ctx = this;
 
@@ -35,7 +53,6 @@ public class ChoosingDate extends Activity {
 
                 long true_date = date - hours*60*60*1000 - minutes*60*1000 - seconds*1000 + 9*3600*1000;
 
-                // удаление оповещения
                 AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
                 Intent myIntent = new Intent(ctx, AlarmNotificationService.class);
                 PendingIntent pendingIntent = PendingIntent.getService(
@@ -43,8 +60,6 @@ public class ChoosingDate extends Activity {
 
                 alarmManager.cancel(pendingIntent);
 
-
-                // установка нового оповещения
                 Intent intent = new Intent(ctx, AlarmNotificationService.class);
                 intent.putExtra("date", true_date);
                 PendingIntent pintent = PendingIntent.getService(ctx, 0, intent,
@@ -55,9 +70,25 @@ public class ChoosingDate extends Activity {
                 alarmManager.set(AlarmManager.RTC_WAKEUP, true_date, pintent);
 
 
-                Intent to_main = new Intent(ctx, MainActivity.class);
-                to_main.putExtra("date", true_date);
-                ctx.startActivity(to_main);
+
+                AppDatabase db = DBProvider.getInstance().getDatabase();
+                AlarmDao dao = db.alarmDao();
+
+                Alarm alarm = dao.getByIdWidget(widgetID);
+                if(alarm != null){
+                    alarm.time = true_date;
+                    dao.update(alarm);
+                }else{
+                    alarm = new Alarm();
+                    alarm.time = true_date;
+                    alarm.id_widget = widgetID;
+                    dao.insert(alarm);
+                }
+
+                Intent resultValue = new Intent();
+                resultValue.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, widgetID);
+
+                setResult(RESULT_OK, resultValue);
 
                 finish();
             }
