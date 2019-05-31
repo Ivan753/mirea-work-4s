@@ -21,49 +21,46 @@ public class MainActivity extends AppWidgetProvider {
     @Override
     public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
 
-        RemoteViews remoteViews = new RemoteViews(context.getPackageName(), R.layout.widget);
+        for (int id: appWidgetIds) {
 
-        AppDatabase db = DBProvider.getInstance().getDatabase();
-        AlarmDao dao = db.alarmDao();
+            RemoteViews remoteViews = new RemoteViews(context.getPackageName(), R.layout.widget);
 
-        System.out.println("AAAAAAAAAAAAAAAa "+appWidgetIds[0]);
+            AppDatabase db = DBProvider.getInstance().getDatabase();
+            AlarmDao dao = db.alarmDao();
 
-        List<Alarm> l = dao.getAll();
+            List<Alarm> l = dao.getAll();
 
-        for(int i = 0; i < l.size(); i++){
-            System.out.println("БД  "+ l.get(i).id_widget);
+            Alarm alarm = dao.getByIdWidget(id);
+
+            if (alarm != null) {
+                long date = alarm.time;
+
+
+                String days = "";
+                long cur_date = System.currentTimeMillis();
+                System.out.println(cur_date + " " + date);
+
+                int days1 = (int) Math.floor((date - cur_date) / (1000 * 60 * 60 * 24));
+
+                days = String.valueOf(days1) + " полных суток осталось до оповещения";
+
+                remoteViews.setTextViewText(R.id.tv, days);
+            } else {
+
+                System.out.println("SDfgkjsdngkjnfkjn");
+            }
+
+            //Подготавливаем Intent для Broadcast
+            Intent active = new Intent(context, MainActivity.class);
+            active.setAction(ACTION_WIDGET_RECEIVER);
+
+            PendingIntent actionPendingIntent = PendingIntent.getBroadcast(context, 0, active, 0);
+
+            remoteViews.setOnClickPendingIntent(R.id.tv, actionPendingIntent);
+
+            appWidgetManager.updateAppWidget(id, remoteViews);
+
         }
-
-        Alarm alarm = dao.getByIdWidget(appWidgetIds[0]);
-
-        if(alarm != null) {
-            long date = alarm.time;
-
-
-            String days = "";
-            long cur_date = System.currentTimeMillis();
-            System.out.println(cur_date + " " + date);
-
-            int days1 = (int) Math.floor((date - cur_date) / (1000 * 60 * 60 * 24));
-
-            days = String.valueOf(days1) + " полных суток осталось до оповещения";
-
-            remoteViews.setTextViewText(R.id.tv, days);
-        }else {
-
-        System.out.println("SDfgkjsdngkjnfkjn");
-        }
-
-        //Подготавливаем Intent для Broadcast
-        Intent active = new Intent(context, MainActivity.class);
-        active.setAction(ACTION_WIDGET_RECEIVER);
-        active.putExtra("msg", "Hello Habrahabr");
-
-        PendingIntent actionPendingIntent = PendingIntent.getBroadcast(context, 0, active, 0);
-
-        remoteViews.setOnClickPendingIntent(R.id.tv, actionPendingIntent);
-
-        appWidgetManager.updateAppWidget(appWidgetIds, remoteViews);
     }
 
     @Override

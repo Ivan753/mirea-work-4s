@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.CalendarView;
+import android.widget.RemoteViews;
 
 import com.example.lab_4.database.Alarm;
 import com.example.lab_4.database.AlarmDao;
@@ -24,7 +25,6 @@ public class ChoosingDate extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_choosing_date);
 
-
         Intent iintent = getIntent();
         Bundle extras = iintent.getExtras();
         if (extras != null) {
@@ -33,8 +33,6 @@ public class ChoosingDate extends AppCompatActivity {
                     AppWidgetManager.INVALID_APPWIDGET_ID
             );
         }
-
-        System.out.println("LOKNOJNOvo oj "+widgetID);
 
         final Context ctx = this;
 
@@ -70,21 +68,41 @@ public class ChoosingDate extends AppCompatActivity {
                 alarmManager.set(AlarmManager.RTC_WAKEUP, true_date, pintent);
 
 
+                String days = "";
 
-                AppDatabase db = DBProvider.getInstance().getDatabase();
-                AlarmDao dao = db.alarmDao();
 
-                Alarm alarm = dao.getByIdWidget(widgetID);
-                if(alarm != null){
-                    alarm.time = true_date;
-                    dao.update(alarm);
+                AppWidgetManager a = AppWidgetManager.getInstance(ctx);
+
+                RemoteViews remoteViews = new RemoteViews(ctx.getPackageName(), R.layout.widget);
+
+                long cur_date = System.currentTimeMillis();
+
+                int days1 = (int) Math.floor((true_date - cur_date) / (1000 * 60 * 60 * 24));
+
+                if(days1 >= 0) {
+                    AppDatabase db = DBProvider.getInstance().getDatabase();
+                    AlarmDao dao = db.alarmDao();
+
+                    Alarm alarm = dao.getByIdWidget(widgetID);
+                    if (alarm != null) {
+                        alarm.time = true_date;
+                        dao.update(alarm);
+                    } else {
+                        alarm = new Alarm();
+                        alarm.time = true_date;
+                        alarm.id_widget = widgetID;
+                        dao.insert(alarm);
+                    }
+                    
+                    days = String.valueOf(days1) + " полных суток осталось";
+
+
                 }else{
-                    alarm = new Alarm();
-                    alarm.time = true_date;
-                    alarm.id_widget = widgetID;
-                    dao.insert(alarm);
+                    days = "Дата уже прошла";
                 }
 
+                remoteViews.setTextViewText(R.id.tv, days);
+                a.updateAppWidget(widgetID, remoteViews);
                 Intent resultValue = new Intent();
                 resultValue.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, widgetID);
 
